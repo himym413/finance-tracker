@@ -1,0 +1,11 @@
+{
+  "name": "hp/personal-finance-tracker",
+  "require": {},
+  "description": "A personal finance tracker built with PHP.",
+  "type": "project",
+  "autoload": {
+    "psr-4": {
+      "App\\": "app/"
+    }
+  }
+}
