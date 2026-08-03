@@ -6,7 +6,7 @@ return [
   'driver' => 'mysql',
   'host' => 'localhost',
   'port' => 3306,
-  'dbname' => 'finance-tracker',
+  'dbname' => 'finance_tracker',
   'charset' => 'utf8mb4',
   'username' => 'root',
   'password' => ''
