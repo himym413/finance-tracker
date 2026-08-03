@@ -1,0 +1,2 @@
+<h1><?= $title ?? 'Dashboard' ?></h1>
+<p>Welcome <?= $user ?? 'Guest' ?></p>

@@ -8,6 +8,9 @@ class DashboardController
 {
   public function index(): void 
   {
-    echo 'Dashboard';
+    view('dashboard/index', [
+      'title' => 'Dashboard',
+      'user' => 'Igor'
+    ]);
   }
 }
