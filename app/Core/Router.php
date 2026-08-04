@@ -4,16 +4,21 @@ declare(strict_types=1);
 
 namespace App\Core;
 
-class Router 
+class Router
 {
   private array $routes = [];
 
-  private function add(string $method, string $uri, array $handler): void 
+  public function __construct(private Container $container)
+  {
+    $this->container = $container;
+  }
+
+  private function add(string $method, string $uri, array $handler): void
   {
     $this->routes[$method][$uri] = $handler;
   }
 
-  public function dispatch(string $httpMethod, string $uri): void 
+  public function dispatch(string $httpMethod, string $uri): void
   {
     $handler = $this->routes[$httpMethod][$uri] ?? null;
 
@@ -25,16 +30,16 @@ class Router
 
     [$controllerClass, $controllerMethod] = $handler;
 
-    $controller = new $controllerClass();
+    $controller = $this->container->resolve($controllerClass);
     $controller->$controllerMethod();
   }
 
-  public function get(string $uri, array $handler): void 
+  public function get(string $uri, array $handler): void
   {
     $this->add('GET', $uri, $handler);
   }
 
-  public function post(string $uri, array $handler): void 
+  public function post(string $uri, array $handler): void
   {
     $this->add('POST', $uri, $handler);
   }
