@@ -1,5 +1,7 @@
 <?php
 
+/** @var object App\Controllers\TransactionController */
+
 declare(strict_types=1);
 
 use App\Controllers\DashboardController;
@@ -11,5 +13,7 @@ $router = new Router($container);
 $router->get('/', [DashboardController::class, 'index']);
 
 $router->get('/transactions', [TransactionController::class, 'index']);
+$router->post('/transactions', [TransactionController::class, 'store']);
+$router->get('/transactions/create', [TransactionController::class, 'create']);
 
 return $router;
