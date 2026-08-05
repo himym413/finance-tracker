@@ -12,9 +12,9 @@ class Database
 {
   private PDO $connection;
   private PDOStatement $statement;
-  
+
   public function __construct(array $config)
-  { 
+  {
     $dsn = sprintf(
       '%s:host=%s;port=%d;dbname=%s;charset=%s',
       $config['driver'],
@@ -25,9 +25,9 @@ class Database
     );
 
     $this->connection = new PDO(
-      $dsn, 
-      $config['username'], 
-      $config['password'], 
+      $dsn,
+      $config['username'],
+      $config['password'],
       [
         PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
         PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
@@ -53,7 +53,7 @@ class Database
   {
     return $this->statement->fetch();
   }
-    
+
   public function findAll(): array
   {
     return $this->statement->fetchAll();

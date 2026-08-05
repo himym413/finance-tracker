@@ -9,8 +9,8 @@
 <?php if (empty($transactions)): ?>
   <p>No transactions found.</p>
 <?php else: ?>
-  <div class="mx-auto max-w-6xl p-6">
-    <div class="overflow-x-auto">
+  <div class="flex flex-col mx-auto max-w-6xl p-6">
+    <div class="overflow-x-auto mb-6">
       <table class="min-w-full divide-y-2 divide-gray-200">
         <thead class="ltr:text-left rtl:text-right">
           <tr class="*:font-medium *:text-gray-900">
@@ -42,6 +42,12 @@
         </tbody>
       </table>
     </div>
+
+    <a
+      class="inline-flex items-center justify-center ml-auto rounded-full border border-indigo-600 bg-indigo-600 px-4 py-2 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-indigo-700 focus-visible:ring-4 focus-visible:ring-indigo-200 focus-visible:outline-none"
+      href="/transactions/create">
+      Add new transaction
+    </a>
   </div>
 <?php endif; ?>
 
