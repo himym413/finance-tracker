@@ -75,8 +75,8 @@ $old ??= [];
         class="mt-1 w-full rounded-lg border-gray-300 focus:border-indigo-500 focus:outline-none bg-white p-1.5"
         id="category" name="category">
         <option value="">Select a category</option>
-        <?php foreach ($categories as $categoryLc => $categoryUc): ?>
-          <option value="<?= htmlspecialchars($categoryLc) ?>" <?= ($old['category'] ?? '') === $categoryLc ? 'selected' : '' ?>><?= htmlspecialchars($categoryUc) ?></option>
+        <?php foreach ($categories as $category => $label): ?>
+          <option value="<?= htmlspecialchars($category) ?>" <?= ($old['category'] ?? '') === $category ? 'selected' : '' ?>><?= htmlspecialchars($label) ?></option>
         <?php endforeach; ?>
       </select>
 
