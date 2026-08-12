@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Repositories;
 
 use App\Database\Database;
+use RuntimeException;
 
 class TransactionRepository
 {
@@ -52,10 +53,6 @@ class TransactionRepository
 
   public function update(int $id, array $data): void
   {
-    if (!$this->findById($id)) {
-      throw new \RuntimeException('Transaction not found.');
-    }
-
     $this->db->query(
       'UPDATE transactions SET
         amount = :amount,
@@ -70,6 +67,14 @@ class TransactionRepository
         ':category' => $data['category'],
         ':id' => $id,
       ]
+    );
+  }
+
+  public function delete(int $id): void
+  {
+    $this->db->query(
+      'DELETE FROM transactions where id = :id',
+      [':id' => $id]
     );
   }
 }

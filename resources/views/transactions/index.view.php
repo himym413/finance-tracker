@@ -91,16 +91,14 @@
                 <td class="px-4 py-3 whitespace-nowrap">
                   <div class="flex justify-end gap-2">
                     <a
-                      href="/transactions/<?= $transaction['id'] ?>/edit"
+                      href="/transactions/<?= htmlspecialchars($transaction['id']) ?>/edit"
                       class="rounded-md px-3 py-1.5 text-sm font-medium text-indigo-600 transition-colors hover:bg-indigo-50 hover:text-indigo-700">
                       Edit
                     </a>
 
-                    <button
-                      type="button"
-                      class="cursor-pointer rounded-md px-3 py-1.5 text-sm font-medium text-red-600 transition-colors hover:bg-red-50 hover:text-red-700">
-                      Delete
-                    </button>
+                    <form action="/transactions/<?= htmlspecialchars($transaction['id']) ?>/delete" method="POST">
+                      <button type="submit" class="cursor-pointer rounded-md px-3 py-1.5 text-sm font-medium text-red-600 transition-colors hover:bg-red-50 hover:text-red-700">Delete</button>
+                    </form>
                   </div>
                 </td>
               </tr>

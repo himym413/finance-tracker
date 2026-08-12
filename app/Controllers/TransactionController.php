@@ -9,6 +9,7 @@ namespace App\Controllers;
 
 use App\Repositories\TransactionRepository;
 use App\Validation\Validator;
+use RuntimeException;
 
 class TransactionController
 {
@@ -101,6 +102,20 @@ class TransactionController
     }
 
     $this->repository->update((int) $id, $data);
+
+    header('Location: /transactions');
+    exit();
+  }
+
+  public function destroy(string $id): void
+  {
+    $transaction = $this->repository->findById((int) $id);
+
+    if (!$transaction) {
+      throw new RuntimeException('Transaction not found.');
+    }
+
+    $this->repository->delete((int) $id);
 
     header('Location: /transactions');
     exit();
