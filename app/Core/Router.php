@@ -21,6 +21,42 @@ class Router
   public function dispatch(string $httpMethod, string $uri): void
   {
     $handler = $this->routes[$httpMethod][$uri] ?? null;
+    $params = [];
+
+    if ($handler === null) {
+      foreach ($this->routes[$httpMethod] ?? [] as $route => $routeHandler) {
+        $routeSegments = explode('/', trim($route, '/'));
+        $uriSegments = explode('/', trim($uri, '/'));
+
+        if (count($routeSegments) !== count($uriSegments)) {
+          continue;
+        }
+
+        $matches = true;
+        $routeParams = [];
+
+        foreach ($routeSegments as $index => $segment) {
+          $isParameter = str_starts_with($segment, '{')
+            && str_ends_with($segment, '}');
+
+          if ($isParameter) {
+            $routeParams[] = $uriSegments[$index];
+            continue;
+          }
+
+          if ($segment !== $uriSegments[$index]) {
+            $matches = false;
+            break;
+          }
+        }
+
+        if ($matches) {
+          $handler = $routeHandler;
+          $params = $routeParams;
+          break;
+        }
+      }
+    }
 
     if ($handler === null) {
       http_response_code(404);
@@ -31,7 +67,7 @@ class Router
     [$controllerClass, $controllerMethod] = $handler;
 
     $controller = $this->container->resolve($controllerClass);
-    $controller->$controllerMethod();
+    $controller->$controllerMethod(...$params);
   }
 
   public function get(string $uri, array $handler): void
