@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Core;
 
 use ReflectionClass;
+use RuntimeException;
 
 class Container
 {
@@ -35,7 +36,7 @@ class Container
       $type = $parameter->getType();
 
       if ($type === null) {
-        throw new \RuntimeException(
+        throw new RuntimeException(
           "Cannot resolve parameter [{$parameter->getName()}] in class [{$class}]."
         );
       }
