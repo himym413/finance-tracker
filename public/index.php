@@ -5,6 +5,8 @@ declare(strict_types=1);
 use App\Core\Container;
 use App\Database\Database;
 
+session_start();
+
 require __DIR__ . '/../vendor/autoload.php';
 
 $config = require __DIR__ . '/../config/database.php';

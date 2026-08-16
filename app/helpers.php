@@ -23,3 +23,20 @@ function view(string $path, array $data = []): void
 
   require $view;
 }
+
+function flash(string $key, ?string $message = null): ?string
+{
+  if ($message !== null) {
+    $_SESSION['_flash'][$key] = $message;
+    return null;
+  }
+
+  if (!isset($_SESSION['_flash'][$key])) {
+    return null;
+  }
+
+  $flashMessage = $_SESSION['_flash'][$key];
+  unset($_SESSION['_flash'][$key]);
+
+  return $flashMessage;
+}
