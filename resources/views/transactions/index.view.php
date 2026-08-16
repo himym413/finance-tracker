@@ -98,9 +98,15 @@
                       Edit
                     </a>
 
-                    <form action="/transactions/<?= htmlspecialchars($transaction['id']) ?>/delete" method="POST">
-                      <button type="submit" class="cursor-pointer rounded-md px-3 py-1.5 text-sm font-medium text-red-600 transition-colors hover:bg-red-50 hover:text-red-700">Delete</button>
-                    </form>
+
+                    <button
+                      type="button"
+                      data-modal-open
+                      data-transaction-id="<?= htmlspecialchars($transaction['id']) ?>"
+                      class="cursor-pointer rounded-md px-3 py-1.5 text-sm font-medium text-red-600 transition-colors hover:bg-red-50 hover:text-red-700">
+                      Delete
+                    </button>
+
                   </div>
                 </td>
               </tr>
@@ -111,5 +117,7 @@
     </div>
   <?php endif; ?>
 </div>
+
+<?php view('transactions/confirmationModal') ?>
 
 <?php view('partials/footer') ?>
