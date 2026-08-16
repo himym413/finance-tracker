@@ -75,7 +75,11 @@ $errors ??= [];
         id="category" name="category">
         <option value="">Select a category</option>
         <?php foreach ($categories as $category => $label): ?>
-          <option value="<?= htmlspecialchars($category) ?>" <?= ($data['category'] ?? '') === $category ? 'selected' : '' ?>><?= htmlspecialchars($label) ?></option>
+          <option
+            value="<?= htmlspecialchars($category) ?>"
+            <?= ($data['category'] ?? '') === $category ? 'selected' : '' ?>>
+            <?= htmlspecialchars($label) ?>
+          </option>
         <?php endforeach; ?>
       </select>
 
@@ -89,7 +93,7 @@ $errors ??= [];
     <button
       class="block w-full cursor-pointer rounded-lg border border-indigo-600 bg-indigo-600 px-12 py-3 text-sm font-medium text-white transition-colors hover:bg-indigo-800"
       type="submit">
-      <?= $submitLabel ?>
+      <?= htmlspecialchars($submitLabel) ?>
     </button>
   </form>
 </div>

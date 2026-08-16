@@ -35,9 +35,9 @@ class Database
     );
   }
 
-  public function query(string $query, array $params = []): self
+  public function query(string $sql, array $params = []): self
   {
-    $statement = $this->connection->prepare($query);
+    $statement = $this->connection->prepare($sql);
 
     if ($statement === false) {
       throw new RuntimeException('Failed to prepare database query.');

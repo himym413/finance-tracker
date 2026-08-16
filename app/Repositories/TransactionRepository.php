@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace App\Repositories;
 
 use App\Database\Database;
-use RuntimeException;
 
 class TransactionRepository
 {
@@ -16,7 +15,7 @@ class TransactionRepository
     return $this->db
       ->query(
         'SELECT * FROM transactions WHERE id = :id',
-        [':id' => $id]
+        ['id' => $id]
       )
       ->find();
   }
@@ -43,10 +42,10 @@ class TransactionRepository
           :category
         )',
       [
-        ':amount' => $data['amount'],
-        ':type' => $data['type'],
-        ':description' => $data['description'],
-        ':category' => $data['category'],
+        'amount' => $data['amount'],
+        'type' => $data['type'],
+        'description' => $data['description'],
+        'category' => $data['category'],
       ]
     );
   }
@@ -61,11 +60,11 @@ class TransactionRepository
         category = :category
          WHERE id = :id',
       [
-        ':amount' => $data['amount'],
-        ':type' => $data['type'],
-        ':description' => $data['description'],
-        ':category' => $data['category'],
-        ':id' => $id,
+        'amount' => $data['amount'],
+        'type' => $data['type'],
+        'description' => $data['description'],
+        'category' => $data['category'],
+        'id' => $id,
       ]
     );
   }
@@ -73,8 +72,8 @@ class TransactionRepository
   public function delete(int $id): void
   {
     $this->db->query(
-      'DELETE FROM transactions where id = :id',
-      [':id' => $id]
+      'DELETE FROM transactions WHERE id = :id',
+      ['id' => $id]
     );
   }
 }

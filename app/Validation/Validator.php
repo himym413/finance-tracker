@@ -36,7 +36,7 @@ class Validator
     return empty($this->errors);
   }
 
-  public function addError(string $key, string $message): void
+  private function addError(string $key, string $message): void
   {
     $this->errors[$key] = $message;
   }

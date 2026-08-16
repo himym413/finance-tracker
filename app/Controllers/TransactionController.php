@@ -37,12 +37,7 @@ class TransactionController
   {
     $categories = $this->categories();
 
-    $data = [
-      'description' => trim($_POST['description'] ?? ''),
-      'amount' => $_POST['amount'] ?? '',
-      'type' => $_POST['type'] ?? '',
-      'category' => $_POST['category'] ?? '',
-    ];
+    $data = $this->transactionData();
 
     if (!$this->validator->validate($data, $categories)) {
       view('transactions/create', [
@@ -57,18 +52,13 @@ class TransactionController
 
     $this->repository->create($data);
 
-    header('Location: /transactions');
-    exit();
+    $this->redirectToIndex();
   }
 
   public function edit(string $id): void
   {
     $categories = $this->categories();
-    $transaction = $this->repository->findById((int) $id);
-
-    if (!$transaction) {
-      throw new \RuntimeException('Transaction not found.');
-    }
+    $transaction = $this->findTransactionOrFail((int) $id);
 
     view('transactions/edit', [
       'data' => $transaction,
@@ -80,13 +70,9 @@ class TransactionController
   public function update(string $id): void
   {
     $categories = $this->categories();
+    $this->findTransactionOrFail((int) $id);
 
-    $data = [
-      'description' => trim($_POST['description'] ?? ''),
-      'amount' => $_POST['amount'] ?? '',
-      'type' => $_POST['type'] ?? '',
-      'category' => $_POST['category'] ?? '',
-    ];
+    $data = $this->transactionData();
 
     if (!$this->validator->validate($data, $categories)) {
       $data['id'] = (int) $id;
@@ -103,22 +89,43 @@ class TransactionController
 
     $this->repository->update((int) $id, $data);
 
-    header('Location: /transactions');
-    exit();
+    $this->redirectToIndex();
   }
 
   public function destroy(string $id): void
   {
-    $transaction = $this->repository->findById((int) $id);
+    $this->findTransactionOrFail((int) $id);
+
+    $this->repository->delete((int) $id);
+
+    $this->redirectToIndex();
+  }
+
+  private function redirectToIndex(): never
+  {
+    header('Location: /transactions');
+    exit();
+  }
+
+  private function transactionData(): array
+  {
+    return [
+      'description' => trim($_POST['description'] ?? ''),
+      'amount' => $_POST['amount'] ?? '',
+      'type' => $_POST['type'] ?? '',
+      'category' => $_POST['category'] ?? '',
+    ];
+  }
+
+  private function findTransactionOrFail(int $id): array
+  {
+    $transaction = $this->repository->findById($id);
 
     if (!$transaction) {
       throw new RuntimeException('Transaction not found.');
     }
 
-    $this->repository->delete((int) $id);
-
-    header('Location: /transactions');
-    exit();
+    return $transaction;
   }
 
   private function categories(): array

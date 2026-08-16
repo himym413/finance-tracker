@@ -8,10 +8,7 @@ class Router
 {
   private array $routes = [];
 
-  public function __construct(private Container $container)
-  {
-    $this->container = $container;
-  }
+  public function __construct(private Container $container) {}
 
   private function add(string $method, string $uri, array $handler): void
   {
@@ -24,37 +21,11 @@ class Router
     $params = [];
 
     if ($handler === null) {
-      foreach ($this->routes[$httpMethod] ?? [] as $route => $routeHandler) {
-        $routeSegments = explode('/', trim($route, '/'));
-        $uriSegments = explode('/', trim($uri, '/'));
+      $match = $this->matchDynamicRoute($httpMethod, $uri);
 
-        if (count($routeSegments) !== count($uriSegments)) {
-          continue;
-        }
-
-        $matches = true;
-        $routeParams = [];
-
-        foreach ($routeSegments as $index => $segment) {
-          $isParameter = str_starts_with($segment, '{')
-            && str_ends_with($segment, '}');
-
-          if ($isParameter) {
-            $routeParams[] = $uriSegments[$index];
-            continue;
-          }
-
-          if ($segment !== $uriSegments[$index]) {
-            $matches = false;
-            break;
-          }
-        }
-
-        if ($matches) {
-          $handler = $routeHandler;
-          $params = $routeParams;
-          break;
-        }
+      if ($match !== null) {
+        $handler = $match['handler'];
+        $params = $match['params'];
       }
     }
 
@@ -68,6 +39,46 @@ class Router
 
     $controller = $this->container->resolve($controllerClass);
     $controller->$controllerMethod(...$params);
+  }
+
+  private function matchDynamicRoute(string $httpMethod, string $uri): ?array
+  {
+    $uriSegments = explode('/', trim($uri, '/'));
+
+    foreach ($this->routes[$httpMethod] ?? [] as $route => $routeHandler) {
+      $routeSegments = explode('/', trim($route, '/'));
+
+      if (count($routeSegments) !== count($uriSegments)) {
+        continue;
+      }
+
+      $matches = true;
+      $routeParams = [];
+
+      foreach ($routeSegments as $index => $segment) {
+        $isParameter = str_starts_with($segment, '{')
+          && str_ends_with($segment, '}');
+
+        if ($isParameter) {
+          $routeParams[] = $uriSegments[$index];
+          continue;
+        }
+
+        if ($segment !== $uriSegments[$index]) {
+          $matches = false;
+          break;
+        }
+      }
+
+      if ($matches) {
+        return [
+          'handler' => $routeHandler,
+          'params' => $routeParams,
+        ];
+      }
+    }
+
+    return null;
   }
 
   public function get(string $uri, array $handler): void
