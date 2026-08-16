@@ -52,6 +52,8 @@ class TransactionController
 
     $this->repository->create($data);
 
+    flash('success', 'Transaction created successfully.');
+
     $this->redirectToIndex();
   }
 
@@ -89,6 +91,8 @@ class TransactionController
 
     $this->repository->update((int) $id, $data);
 
+    flash('success', 'Transaction edited successfully.');
+
     $this->redirectToIndex();
   }
 
@@ -97,6 +101,8 @@ class TransactionController
     $this->findTransactionOrFail((int) $id);
 
     $this->repository->delete((int) $id);
+
+    flash('success', 'Transaction deleted successfully.');
 
     $this->redirectToIndex();
   }

@@ -7,6 +7,8 @@
 
 <?php view('partials/head', ['pageTitle' => $pageTitle]) ?>
 
+<?php view('partials/flash'); ?>
+
 <div class="mx-auto max-w-6xl p-6">
   <div class="mb-6 flex items-center justify-between gap-4">
     <div>
