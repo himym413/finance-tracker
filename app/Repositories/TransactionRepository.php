@@ -27,6 +27,13 @@ class TransactionRepository
       ->findAll();
   }
 
+  public function search(string $search): array
+  {
+    return $this->db
+      ->query('SELECT * FROM transactions WHERE description LIKE :search', ['search' => "%{$search}%"])
+      ->findAll();
+  }
+
   public function create(array $data): void
   {
     $this->db->query(
