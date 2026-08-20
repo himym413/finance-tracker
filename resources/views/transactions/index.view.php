@@ -3,6 +3,9 @@
 /** @var array $transactions */
 /** @var string $pageTitle */
 /** @var string $search */
+/** @var string $type */
+/** @var string $selectedCategory */
+/** @var array $categories */
 
 ?>
 
@@ -37,13 +40,34 @@
       value="<?= htmlspecialchars($search) ?>"
       class="w-full max-w-sm rounded-lg border border-gray-300 bg-white px-4 py-2 text-sm text-gray-900 shadow-sm placeholder:text-gray-400 focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-200" />
 
+    <select
+      name="type"
+      class="rounded-lg border border-gray-300 bg-white px-4 py-2 text-sm text-gray-900 shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-200">
+      <option value="">All types</option>
+      <option value="income" <?= $type === 'income' ? 'selected' : '' ?>>
+        Income
+      </option>
+      <option value="expense" <?= $type === 'expense' ? 'selected' : '' ?>>
+        Expense
+      </option>
+    </select>
+
+    <select
+      name="category"
+      class="rounded-lg border border-gray-300 bg-white px-4 py-2 text-sm text-gray-900 shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-200">
+      <option value="">All categories</option>
+      <?php foreach ($categories as $category => $label): ?>
+        <option value="<?= htmlspecialchars($category) ?>" <?= $selectedCategory === $category ? 'selected' : '' ?>><?= htmlspecialchars($label) ?></option>
+      <?php endforeach; ?>
+    </select>
+
     <button
       type="submit"
       class="cursor-pointer inline-flex items-center justify-center rounded-lg bg-indigo-600 px-4 py-2 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-indigo-700 focus:outline-none focus:ring-4 focus:ring-indigo-200">
       Search
     </button>
 
-    <?php if ($search !== ''): ?>
+    <?php if ($search !== '' || $type !== '' || $selectedCategory !== ''): ?>
       <a
         href="/transactions"
         class="rounded-lg px-4 py-2 text-sm font-medium text-gray-600 transition-colors hover:bg-gray-100 hover:text-gray-900">

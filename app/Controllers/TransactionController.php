@@ -18,14 +18,28 @@ class TransactionController
   public function index(): void
   {
     $search = trim($_GET['search'] ?? '');
+    $type = $_GET['type'] ?? '';
+    $category = $_GET['category'] ?? '';
+    $categories = $this->categories();
 
-    $transactions = $search !== ''
-      ? $this->repository->search($search)
+    if ($type !== '' && $type !== 'income' && $type !== 'expense') {
+      throw new RuntimeException('Not a valid type filter.');
+    }
+
+    if ($category !== '' && !array_key_exists($category, $categories)) {
+      throw new RuntimeException('Not a valid category filter.');
+    }
+
+    $transactions = $search !== '' || $type !== '' || $category !== ''
+      ? $this->repository->filter($search, $type, $category)
       : $this->repository->findAll();
 
     view('transactions/index', [
       'transactions' => $transactions,
       'search' => $search,
+      'type' => $type,
+      'selectedCategory' => $category,
+      'categories' => $categories,
       'pageTitle' => 'Transactions',
     ]);
   }

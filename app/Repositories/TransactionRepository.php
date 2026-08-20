@@ -23,14 +23,34 @@ class TransactionRepository
   public function findAll(): array
   {
     return $this->db
-      ->query('SELECT * FROM transactions')
+      ->query('SELECT * FROM transactions ORDER BY created_at DESC')
       ->findAll();
   }
 
-  public function search(string $search): array
+  public function filter(string $search, string $type, string $category): array
   {
+    $sql = 'SELECT * FROM transactions WHERE 1=1';
+    $params = [];
+
+    if ($search !== '') {
+      $sql .= ' AND description LIKE :search';
+      $params['search'] = "%{$search}%";
+    }
+
+    if ($type !== '') {
+      $sql .= ' AND type = :type';
+      $params['type'] = $type;
+    }
+
+    if ($category !== '') {
+      $sql .= ' AND category = :category';
+      $params['category'] = $category;
+    }
+
+    $sql .= ' ORDER BY created_at DESC';
+
     return $this->db
-      ->query('SELECT * FROM transactions WHERE description LIKE :search', ['search' => "%{$search}%"])
+      ->query($sql, $params)
       ->findAll();
   }
 
