@@ -21,6 +21,8 @@ class TransactionController
     $type = $_GET['type'] ?? '';
     $category = $_GET['category'] ?? '';
     $categories = $this->categories();
+    $sort = $_GET['sort'] ?? 'date_desc';
+    $sortOptions = $this->sortOptions();
 
     if ($type !== '' && $type !== 'income' && $type !== 'expense') {
       throw new RuntimeException('Not a valid type filter.');
@@ -30,8 +32,12 @@ class TransactionController
       throw new RuntimeException('Not a valid category filter.');
     }
 
-    $transactions = $search !== '' || $type !== '' || $category !== ''
-      ? $this->repository->filter($search, $type, $category)
+    if ($sort !== '' && !array_key_exists($sort, $sortOptions)) {
+      throw new RuntimeException('Not a valid sort option.');
+    }
+
+    $transactions = $search !== '' || $type !== '' || $category !== '' || $sort !== 'date_desc'
+      ? $this->repository->filter($search, $type, $category, $sortOptions[$sort]['sql'])
       : $this->repository->findAll();
 
     view('transactions/index', [
@@ -40,6 +46,8 @@ class TransactionController
       'type' => $type,
       'selectedCategory' => $category,
       'categories' => $categories,
+      'selectedSort' => $sort,
+      'sortOptions' => $sortOptions,
       'pageTitle' => 'Transactions',
     ]);
   }
@@ -156,5 +164,10 @@ class TransactionController
   private function categories(): array
   {
     return require __DIR__ . '/../../config/categories.php';
+  }
+
+  private function sortOptions(): array
+  {
+    return require __DIR__ . '/../../config/sortOptions.php';
   }
 }
