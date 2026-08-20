@@ -27,7 +27,7 @@ class TransactionRepository
       ->findAll();
   }
 
-  public function filter(string $search, string $type, string $category): array
+  public function filter(string $search, string $type, string $category, string $sortOption): array
   {
     $sql = 'SELECT * FROM transactions WHERE 1=1';
     $params = [];
@@ -47,7 +47,9 @@ class TransactionRepository
       $params['category'] = $category;
     }
 
-    $sql .= ' ORDER BY created_at DESC';
+    if ($sortOption !== '') {
+      $sql .= ' ORDER BY ' . $sortOption;
+    }
 
     return $this->db
       ->query($sql, $params)
