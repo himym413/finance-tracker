@@ -17,10 +17,15 @@ class TransactionController
 
   public function index(): void
   {
-    $transactions = $this->repository->findAll();
+    $search = trim($_GET['search'] ?? '');
+
+    $transactions = $search !== ''
+      ? $this->repository->search($search)
+      : $this->repository->findAll();
 
     view('transactions/index', [
       'transactions' => $transactions,
+      'search' => $search,
       'pageTitle' => 'Transactions',
     ]);
   }
