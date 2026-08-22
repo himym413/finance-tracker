@@ -20,14 +20,14 @@ class TransactionRepository
       ->find();
   }
 
-  public function findAll(): array
+  public function findAll(int $limit, int $offset): array
   {
     return $this->db
-      ->query('SELECT * FROM transactions ORDER BY created_at DESC')
+      ->query("SELECT * FROM transactions ORDER BY created_at DESC LIMIT {$limit} OFFSET {$offset}")
       ->findAll();
   }
 
-  public function filter(string $search, string $type, string $category, string $sortOption): array
+  public function filter(string $search, string $type, string $category, string $sortOption, int $limit, int $offset): array
   {
     $sql = 'SELECT * FROM transactions WHERE 1=1';
     $params = [];
@@ -51,9 +51,35 @@ class TransactionRepository
       $sql .= ' ORDER BY ' . $sortOption;
     }
 
+    $sql .= " LIMIT {$limit} OFFSET {$offset}";
+
     return $this->db
       ->query($sql, $params)
       ->findAll();
+  }
+
+  public function countFiltered(string $search, string $type, string $category): int
+  {
+    $sql = 'SELECT COUNT(*) AS total FROM transactions WHERE 1=1';
+    $params = [];
+
+    if ($search !== '') {
+      $sql .= ' AND description LIKE :search';
+      $params['search'] = "%{$search}%";
+    }
+
+    if ($type !== '') {
+      $sql .= ' AND type = :type';
+      $params['type'] = $type;
+    }
+
+    if ($category !== '') {
+      $sql .= ' AND category = :category';
+      $params['category'] = $category;
+    }
+
+    $result = $this->db->query($sql, $params)->find();
+    return (int) $result['total'];
   }
 
   public function create(array $data): void

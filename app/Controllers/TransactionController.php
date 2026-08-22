@@ -23,6 +23,9 @@ class TransactionController
     $categories = $this->categories();
     $sort = $_GET['sort'] ?? 'date_desc';
     $sortOptions = $this->sortOptions();
+    $params = $_GET;
+    $perPage = 5;
+
 
     if ($type !== '' && $type !== 'income' && $type !== 'expense') {
       throw new RuntimeException('Not a valid type filter.');
@@ -36,11 +39,20 @@ class TransactionController
       throw new RuntimeException('Not a valid sort option.');
     }
 
+    $totalResults = $this->repository->countFiltered($search, $type, $category);
+    $totalPages = max(1, (int) ceil($totalResults / $perPage));
+    $page = max(1, (int) ($_GET['page'] ?? 1));
+    if ($page > $totalPages) $page = $totalPages;
+    $offset = ($page - 1) * $perPage;
+
     $transactions = $search !== '' || $type !== '' || $category !== '' || $sort !== 'date_desc'
-      ? $this->repository->filter($search, $type, $category, $sortOptions[$sort]['sql'])
-      : $this->repository->findAll();
+      ? $this->repository->filter($search, $type, $category, $sortOptions[$sort]['sql'], $perPage, $offset)
+      : $this->repository->findAll($perPage, $offset);
 
     view('transactions/index', [
+      'page' => $page,
+      'totalPages' => $totalPages,
+      'params' => $params,
       'transactions' => $transactions,
       'search' => $search,
       'type' => $type,
