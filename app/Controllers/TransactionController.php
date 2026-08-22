@@ -13,55 +13,85 @@ use RuntimeException;
 
 class TransactionController
 {
+  private const PER_PAGE = 10;
+
   public function __construct(private TransactionRepository $repository, private Validator $validator) {}
 
   public function index(): void
   {
-    $search = trim($_GET['search'] ?? '');
-    $type = $_GET['type'] ?? '';
-    $category = $_GET['category'] ?? '';
+    $filters = [
+      'search' => trim($_GET['search'] ?? ''),
+      'type' => $_GET['type'] ?? '',
+      'category' => $_GET['category'] ?? '',
+      'sort' => $_GET['sort'] ?? 'date_desc',
+    ];
     $categories = $this->categories();
-    $sort = $_GET['sort'] ?? 'date_desc';
     $sortOptions = $this->sortOptions();
-    $params = $_GET;
-    $perPage = 5;
 
+    $this->validateFilters($filters, $categories, $sortOptions);
 
-    if ($type !== '' && $type !== 'income' && $type !== 'expense') {
-      throw new RuntimeException('Not a valid type filter.');
-    }
+    $paginationData = $this->getPaginationData($filters);
 
-    if ($category !== '' && !array_key_exists($category, $categories)) {
-      throw new RuntimeException('Not a valid category filter.');
-    }
-
-    if ($sort !== '' && !array_key_exists($sort, $sortOptions)) {
-      throw new RuntimeException('Not a valid sort option.');
-    }
-
-    $totalResults = $this->repository->countFiltered($search, $type, $category);
-    $totalPages = max(1, (int) ceil($totalResults / $perPage));
-    $page = max(1, (int) ($_GET['page'] ?? 1));
-    if ($page > $totalPages) $page = $totalPages;
-    $offset = ($page - 1) * $perPage;
-
-    $transactions = $search !== '' || $type !== '' || $category !== '' || $sort !== 'date_desc'
-      ? $this->repository->filter($search, $type, $category, $sortOptions[$sort]['sql'], $perPage, $offset)
-      : $this->repository->findAll($perPage, $offset);
+    $transactions = $this->getTransactions($filters, $sortOptions, $paginationData['offset']);
 
     view('transactions/index', [
-      'page' => $page,
-      'totalPages' => $totalPages,
-      'params' => $params,
+      'page' => $paginationData['page'],
+      'totalPages' => $paginationData['totalPages'],
+      'params' => $paginationData['params'],
       'transactions' => $transactions,
-      'search' => $search,
-      'type' => $type,
-      'selectedCategory' => $category,
+      'search' => $filters['search'],
+      'type' => $filters['type'],
+      'selectedCategory' => $filters['category'],
       'categories' => $categories,
-      'selectedSort' => $sort,
+      'selectedSort' => $filters['sort'],
       'sortOptions' => $sortOptions,
       'pageTitle' => 'Transactions',
     ]);
+  }
+
+  private function validateFilters(array $filters, array $categories, array $sortOptions): void
+  {
+    if ($filters['type'] !== '' && $filters['type'] !== 'income' && $filters['type'] !== 'expense') {
+      throw new RuntimeException('Not a valid type filter.');
+    }
+
+    if ($filters['category'] !== '' && !array_key_exists($filters['category'], $categories)) {
+      throw new RuntimeException('Not a valid category filter.');
+    }
+
+    if ($filters['sort'] !== '' && !array_key_exists($filters['sort'], $sortOptions)) {
+      throw new RuntimeException('Not a valid sort option.');
+    }
+  }
+
+  private function getPaginationData(array $filters): array
+  {
+    $params = $_GET;
+    $totalResults = $this->repository->countFiltered($filters);
+    $totalPages = max(1, (int) ceil($totalResults / self::PER_PAGE));
+    $page = max(1, (int) ($_GET['page'] ?? 1));
+
+    if ($page > $totalPages) {
+      $page = $totalPages;
+    }
+
+    $offset = ($page - 1) * self::PER_PAGE;
+
+    return [
+      'params' => $params,
+      'totalPages' => $totalPages,
+      'page' => $page,
+      'offset' => $offset,
+    ];
+  }
+
+  private function getTransactions(array $filters, array $sortOptions, int $offset): array
+  {
+    $hasFilters = $filters['search'] !== '' || $filters['type'] !== '' || $filters['category'] !== '' || $filters['sort'] !== 'date_desc';
+
+    return $hasFilters
+      ? $this->repository->filter($filters, $sortOptions[$filters['sort']]['sql'], self::PER_PAGE, $offset)
+      : $this->repository->findAll(self::PER_PAGE, $offset);
   }
 
   public function create(): void
@@ -118,7 +148,7 @@ class TransactionController
     if (!$this->validator->validate($data, $categories)) {
       $data['id'] = (int) $id;
 
-      view("transactions/edit", [
+      view('transactions/edit', [
         'errors' => $this->validator->errors(),
         'data' => $data,
         'categories' => $categories,
