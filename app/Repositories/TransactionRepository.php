@@ -27,25 +27,14 @@ class TransactionRepository
       ->findAll();
   }
 
-  public function filter(string $search, string $type, string $category, string $sortOption, int $limit, int $offset): array
+  public function filter(array $filters, string $sortOption, int $limit, int $offset): array
   {
     $sql = 'SELECT * FROM transactions WHERE 1=1';
-    $params = [];
 
-    if ($search !== '') {
-      $sql .= ' AND description LIKE :search';
-      $params['search'] = "%{$search}%";
-    }
+    $queryParts = $this->applyFilters($sql, $filters);
 
-    if ($type !== '') {
-      $sql .= ' AND type = :type';
-      $params['type'] = $type;
-    }
-
-    if ($category !== '') {
-      $sql .= ' AND category = :category';
-      $params['category'] = $category;
-    }
+    $sql = $queryParts['sql'];
+    $params = $queryParts['params'];
 
     if ($sortOption !== '') {
       $sql .= ' ORDER BY ' . $sortOption;
@@ -58,27 +47,17 @@ class TransactionRepository
       ->findAll();
   }
 
-  public function countFiltered(string $search, string $type, string $category): int
+  public function countFiltered(array $filters): int
   {
     $sql = 'SELECT COUNT(*) AS total FROM transactions WHERE 1=1';
-    $params = [];
 
-    if ($search !== '') {
-      $sql .= ' AND description LIKE :search';
-      $params['search'] = "%{$search}%";
-    }
+    $queryParts = $this->applyFilters($sql, $filters);
 
-    if ($type !== '') {
-      $sql .= ' AND type = :type';
-      $params['type'] = $type;
-    }
-
-    if ($category !== '') {
-      $sql .= ' AND category = :category';
-      $params['category'] = $category;
-    }
+    $sql = $queryParts['sql'];
+    $params = $queryParts['params'];
 
     $result = $this->db->query($sql, $params)->find();
+
     return (int) $result['total'];
   }
 
@@ -130,5 +109,30 @@ class TransactionRepository
       'DELETE FROM transactions WHERE id = :id',
       ['id' => $id]
     );
+  }
+
+  private function applyFilters(string $sql, array $filters): array
+  {
+    $params = [];
+
+    if ($filters['search'] !== '') {
+      $sql .= ' AND description LIKE :search';
+      $params['search'] = "%{$filters['search']}%";
+    }
+
+    if ($filters['type'] !== '') {
+      $sql .= ' AND type = :type';
+      $params['type'] = $filters['type'];
+    }
+
+    if ($filters['category'] !== '') {
+      $sql .= ' AND category = :category';
+      $params['category'] = $filters['category'];
+    }
+
+    return [
+      'sql' => $sql,
+      'params' => $params,
+    ];
   }
 }
