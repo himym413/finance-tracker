@@ -21,4 +21,9 @@ $router = require __DIR__ . '/../routes/web.php';
 $uri = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH) ?: '/';
 $httpMethod = $_SERVER['REQUEST_METHOD'];
 
-$router->dispatch($httpMethod, $uri);
+try {
+  $router->dispatch($httpMethod, $uri);
+} catch (Throwable $e) {
+  http_response_code(500);
+  view('errors/500');
+}

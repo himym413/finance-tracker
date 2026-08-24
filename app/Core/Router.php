@@ -31,7 +31,7 @@ class Router
 
     if ($handler === null) {
       http_response_code(404);
-      echo '404 Not Found';
+      view('errors/404');
       return;
     }
 
