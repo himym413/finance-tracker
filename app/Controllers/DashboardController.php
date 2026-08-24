@@ -1,23 +1,31 @@
-<?php 
+<?php
 
 declare(strict_types=1);
 
 namespace App\Controllers;
 
 use App\Database\Database;
+use App\Repositories\TransactionRepository;
 
 class DashboardController
 {
-  public function __construct(private Database $db)
-  {
-    
-  }
+  private const DASHBOARD_DISPLAY = 5;
 
-  public function index(): void 
+  public function __construct(private TransactionRepository $repository) {}
+
+  public function index(): void
   {
+    $summary = $this->repository->summary();
+    $transactions = $this->repository->findAll(self::DASHBOARD_DISPLAY, 0);
+
     view('dashboard/index', [
-      'title' => 'Dashboard',
-      'user' => 'Igor'
+      'pageTitle' => 'Dashboard',
+      'user' => 'Igor',
+      'totalIncome' => $summary['totalIncome'],
+      'totalExpense' => $summary['totalExpense'],
+      'balance' => $summary['balance'],
+      'totalTransactions' => $summary['totalTransactions'],
+      'transactions' => $transactions,
     ]);
   }
 }

@@ -11,6 +11,25 @@ $errors ??= [];
 ?>
 
 <div class="p-6">
+  <a
+    href="/transactions"
+    class="mb-6 inline-flex items-center gap-2 rounded-lg border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 shadow-sm transition-all hover:border-gray-400 hover:bg-gray-50 hover:text-gray-900 focus:outline-none focus:ring-4 focus:ring-gray-200">
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      class="size-4"
+      fill="none"
+      viewBox="0 0 24 24"
+      stroke="currentColor"
+      stroke-width="2">
+      <path
+        stroke-linecap="round"
+        stroke-linejoin="round"
+        d="M15 19l-7-7 7-7" />
+    </svg>
+
+    Go back
+  </a>
+
   <form
     action="<?= htmlspecialchars($action) ?>" method="POST"
     class="mx-auto max-w-md space-y-4 rounded-lg border border-gray-300 bg-gray-100 p-6">

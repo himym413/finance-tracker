@@ -56,6 +56,7 @@ class TransactionRepository
     $sql = $queryParts['sql'];
     $params = $queryParts['params'];
 
+
     $result = $this->db->query($sql, $params)->find();
 
     return (int) $result['total'];
@@ -109,6 +110,42 @@ class TransactionRepository
       'DELETE FROM transactions WHERE id = :id',
       ['id' => $id]
     );
+  }
+
+  public function summary(): array
+  {
+    $result = $this->db->query(
+      'SELECT
+        COALESCE(SUM(
+          CASE
+            WHEN type = :income
+            THEN amount
+            ELSE 0
+          END
+        ), 0) AS totalIncome,
+
+        COALESCE(SUM(
+          CASE
+            WHEN type = :expense 
+            THEN amount
+            ELSE 0
+          END
+        ), 0) AS totalExpense,
+
+        COUNT(*) AS totalTransactions
+      FROM transactions',
+      [
+        'income' => 'income',
+        'expense' => 'expense',
+      ]
+    )->find();
+
+    return [
+      'totalIncome' => (float) $result['totalIncome'],
+      'totalExpense' => (float) $result['totalExpense'],
+      'balance' => (float) $result['totalIncome'] - (float) $result['totalExpense'],
+      'totalTransactions' => (int) $result['totalTransactions'],
+    ];
   }
 
   private function applyFilters(string $sql, array $filters): array
