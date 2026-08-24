@@ -10,28 +10,36 @@ class TransactionRepository
 {
   public function __construct(private Database $db) {}
 
-  public function findById(int $id): array|false
+  public function findById(int $id, int $userId): array|false
   {
     return $this->db
       ->query(
-        'SELECT * FROM transactions WHERE id = :id',
-        ['id' => $id]
+        'SELECT * FROM transactions WHERE id = :id AND user_id = :userId',
+        [
+          'id' => $id,
+          'userId' => $userId
+        ]
       )
       ->find();
   }
 
-  public function findAll(int $limit, int $offset): array
+  public function findAll(int $userId, int $limit, int $offset): array
   {
     return $this->db
-      ->query("SELECT * FROM transactions ORDER BY created_at DESC LIMIT {$limit} OFFSET {$offset}")
+      ->query(
+        "SELECT * FROM transactions WHERE user_id = :userId ORDER BY created_at DESC LIMIT {$limit} OFFSET {$offset}",
+        [
+          'userId' => $userId,
+        ]
+      )
       ->findAll();
   }
 
-  public function filter(array $filters, string $sortOption, int $limit, int $offset): array
+  public function filter(array $filters, string $sortOption, int $limit, int $offset, int $userId): array
   {
     $sql = 'SELECT * FROM transactions WHERE 1=1';
 
-    $queryParts = $this->applyFilters($sql, $filters);
+    $queryParts = $this->applyFilters($sql, $filters, $userId);
 
     $sql = $queryParts['sql'];
     $params = $queryParts['params'];
@@ -47,11 +55,11 @@ class TransactionRepository
       ->findAll();
   }
 
-  public function countFiltered(array $filters): int
+  public function countFiltered(array $filters, int $userId): int
   {
     $sql = 'SELECT COUNT(*) AS total FROM transactions WHERE 1=1';
 
-    $queryParts = $this->applyFilters($sql, $filters);
+    $queryParts = $this->applyFilters($sql, $filters, $userId);
 
     $sql = $queryParts['sql'];
     $params = $queryParts['params'];
@@ -62,21 +70,24 @@ class TransactionRepository
     return (int) $result['total'];
   }
 
-  public function create(array $data): void
+  public function create(int $userId, array $data): void
   {
     $this->db->query(
       'INSERT INTO transactions (
+          user_id,
           amount, 
           type, 
           description, 
           category
         ) VALUES (
+          :userId,
           :amount, 
           :type, 
           :description, 
           :category
         )',
       [
+        'userId' => $userId,
         'amount' => $data['amount'],
         'type' => $data['type'],
         'description' => $data['description'],
@@ -85,7 +96,7 @@ class TransactionRepository
     );
   }
 
-  public function update(int $id, array $data): void
+  public function update(int $id, array $data, int $userId): void
   {
     $this->db->query(
       'UPDATE transactions SET
@@ -93,26 +104,30 @@ class TransactionRepository
         type = :type,
         description = :description,
         category = :category
-         WHERE id = :id',
+         WHERE id = :id AND user_id = :userId',
       [
         'amount' => $data['amount'],
         'type' => $data['type'],
         'description' => $data['description'],
         'category' => $data['category'],
         'id' => $id,
+        'userId' => $userId,
       ]
     );
   }
 
-  public function delete(int $id): void
+  public function delete(int $id, int $userId): void
   {
     $this->db->query(
-      'DELETE FROM transactions WHERE id = :id',
-      ['id' => $id]
+      'DELETE FROM transactions WHERE id = :id AND user_id = :userId',
+      [
+        'id' => $id,
+        'userId' => $userId,
+      ]
     );
   }
 
-  public function summary(): array
+  public function summary(int $userId): array
   {
     $result = $this->db->query(
       'SELECT
@@ -133,10 +148,11 @@ class TransactionRepository
         ), 0) AS totalExpense,
 
         COUNT(*) AS totalTransactions
-      FROM transactions',
+      FROM transactions WHERE user_id = :userId',
       [
         'income' => 'income',
         'expense' => 'expense',
+        'userId' => $userId,
       ]
     )->find();
 
@@ -148,7 +164,7 @@ class TransactionRepository
     ];
   }
 
-  private function applyFilters(string $sql, array $filters): array
+  private function applyFilters(string $sql, array $filters, int $userId): array
   {
     $params = [];
 
@@ -166,6 +182,9 @@ class TransactionRepository
       $sql .= ' AND category = :category';
       $params['category'] = $filters['category'];
     }
+
+    $sql .= ' AND user_id = :userId';
+    $params['userId'] = $userId;
 
     return [
       'sql' => $sql,

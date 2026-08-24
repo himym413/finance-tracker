@@ -6,8 +6,6 @@
 /** @var array $errors */
 /** @var string $action */
 
-$errors ??= [];
-
 ?>
 
 <div class="p-6">

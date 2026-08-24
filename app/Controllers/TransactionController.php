@@ -13,7 +13,7 @@ use RuntimeException;
 
 class TransactionController
 {
-  private const PER_PAGE = 10;
+  private const RESULTS_PER_PAGE = 10;
 
   public function __construct(private TransactionRepository $repository, private Validator $validator) {}
 
@@ -67,15 +67,15 @@ class TransactionController
   private function getPaginationData(array $filters): array
   {
     $params = $_GET;
-    $totalResults = $this->repository->countFiltered($filters);
-    $totalPages = max(1, (int) ceil($totalResults / self::PER_PAGE));
+    $totalResults = $this->repository->countFiltered($filters, userId());
+    $totalPages = max(1, (int) ceil($totalResults / self::RESULTS_PER_PAGE));
     $page = max(1, (int) ($_GET['page'] ?? 1));
 
     if ($page > $totalPages) {
       $page = $totalPages;
     }
 
-    $offset = ($page - 1) * self::PER_PAGE;
+    $offset = ($page - 1) * self::RESULTS_PER_PAGE;
 
     return [
       'params' => $params,
@@ -90,8 +90,8 @@ class TransactionController
     $hasFilters = $filters['search'] !== '' || $filters['type'] !== '' || $filters['category'] !== '' || $filters['sort'] !== 'date_desc';
 
     return $hasFilters
-      ? $this->repository->filter($filters, $sortOptions[$filters['sort']]['sql'], self::PER_PAGE, $offset)
-      : $this->repository->findAll(self::PER_PAGE, $offset);
+      ? $this->repository->filter($filters, $sortOptions[$filters['sort']]['sql'], self::RESULTS_PER_PAGE, $offset, userId())
+      : $this->repository->findAll(userId(), self::RESULTS_PER_PAGE, $offset);
   }
 
   public function create(): void
@@ -119,7 +119,7 @@ class TransactionController
       return;
     }
 
-    $this->repository->create($data);
+    $this->repository->create(userId(), $data);
 
     flash('success', 'Transaction created successfully.');
 
@@ -158,7 +158,7 @@ class TransactionController
       return;
     }
 
-    $this->repository->update((int) $id, $data);
+    $this->repository->update((int) $id, $data, userId());
 
     flash('success', 'Transaction edited successfully.');
 
@@ -169,7 +169,7 @@ class TransactionController
   {
     $this->findTransactionOrFail((int) $id);
 
-    $this->repository->delete((int) $id);
+    $this->repository->delete((int) $id, userId());
 
     flash('success', 'Transaction deleted successfully.');
 
@@ -194,7 +194,7 @@ class TransactionController
 
   private function findTransactionOrFail(int $id): array
   {
-    $transaction = $this->repository->findById($id);
+    $transaction = $this->repository->findById($id, userId());
 
     if (!$transaction) {
       throw new RuntimeException('Transaction not found.');

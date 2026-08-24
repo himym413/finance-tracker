@@ -8,18 +8,17 @@ use App\Repositories\TransactionRepository;
 
 class DashboardController
 {
-  private const DASHBOARD_DISPLAY = 5;
+  private const DISPLAY_LATEST = 5;
 
   public function __construct(private TransactionRepository $repository) {}
 
   public function index(): void
   {
-    $summary = $this->repository->summary();
-    $transactions = $this->repository->findAll(self::DASHBOARD_DISPLAY, 0);
+    $summary = $this->repository->summary(userId());
+    $transactions = $this->repository->findAll(userId(), self::DISPLAY_LATEST, 0);
 
     view('dashboard/index', [
       'pageTitle' => 'Dashboard',
-      'user' => 'Igor',
       'totalIncome' => $summary['totalIncome'],
       'totalExpense' => $summary['totalExpense'],
       'balance' => $summary['balance'],
