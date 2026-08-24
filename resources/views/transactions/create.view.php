@@ -14,7 +14,7 @@ $errors ??= [];
 <?php view('transactions/_form', [
   'data' => $data,
   'categories' => $categories,
-  'errors' => $errors,
+  'errors' => $errors ?? [],
   'submitLabel' => 'Add Transaction',
   'action' => '/transactions'
 ]) ?>

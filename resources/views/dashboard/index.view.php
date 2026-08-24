@@ -1,7 +1,6 @@
 <?php
 
 /** @var string $pageTitle */
-/** @var string $user */
 /** @var float $totalIncome */
 /** @var float $totalExpense */
 /** @var float $balance */
@@ -14,7 +13,17 @@
 
 <div class="flex flex-1 flex-col overflow-y-auto">
   <header class="flex items-center justify-between border-b border-gray-200 bg-white px-6 py-4">
-    <h1 class="text-lg font-semibold text-gray-900">Welcome <?= $user ?? 'User' ?></h1>
+    <h1 class="text-lg font-semibold text-gray-900">
+      Welcome <?= htmlspecialchars($_SESSION['user_name'] ?? 'User') ?>
+    </h1>
+
+    <form action="/logout" method="POST">
+      <button
+        type="submit"
+        class="inline-flex cursor-pointer items-center rounded-lg border border-red-200 bg-red-50 px-4 py-2 text-sm font-semibold text-red-700 transition-colors hover:bg-red-100 hover:border-red-300 focus:outline-none focus:ring-4 focus:ring-red-200">
+        Logout
+      </button>
+    </form>
   </header>
 
   <main class="flex-1 space-y-6 p-6">

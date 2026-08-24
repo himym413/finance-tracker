@@ -40,3 +40,19 @@ function flash(string $key, ?string $message = null): ?string
 
   return $flashMessage;
 }
+
+function userId(): int
+{
+  return (int) $_SESSION['user_id'];
+}
+
+function isAuthenticated(): bool
+{
+  return isset($_SESSION['user_id']);
+}
+
+function redirect(string $path): never
+{
+  header("Location: {$path}");
+  exit();
+}

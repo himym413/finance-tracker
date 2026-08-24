@@ -7,35 +7,51 @@ namespace App\Core;
 class Router
 {
   private array $routes = [];
+  private string $lastMethod;
+  private string $lastUri;
 
   public function __construct(private Container $container) {}
 
   private function add(string $method, string $uri, array $handler): void
   {
-    $this->routes[$method][$uri] = $handler;
+    $this->routes[$method][$uri] = [
+      'handler' => $handler,
+      'middleware' => null,
+    ];
+
+    $this->lastMethod = $method;
+    $this->lastUri = $uri;
   }
 
   public function dispatch(string $httpMethod, string $uri): void
   {
-    $handler = $this->routes[$httpMethod][$uri] ?? null;
+    $route = $this->routes[$httpMethod][$uri] ?? null;
     $params = [];
 
-    if ($handler === null) {
+    if ($route === null) {
       $match = $this->matchDynamicRoute($httpMethod, $uri);
 
       if ($match !== null) {
-        $handler = $match['handler'];
+        $route = $match['route'];
         $params = $match['params'];
       }
     }
 
-    if ($handler === null) {
+    if ($route === null) {
       http_response_code(404);
       view('errors/404');
       return;
     }
 
-    [$controllerClass, $controllerMethod] = $handler;
+    $middleware = $route['middleware'];
+
+    if ($middleware === 'guest' && isAuthenticated())
+      redirect('/');
+
+    if ($middleware === 'auth' && !isAuthenticated())
+      redirect('/login');
+
+    [$controllerClass, $controllerMethod] = $route['handler'];
 
     $controller = $this->container->resolve($controllerClass);
     $controller->$controllerMethod(...$params);
@@ -72,7 +88,7 @@ class Router
 
       if ($matches) {
         return [
-          'handler' => $routeHandler,
+          'route' => $routeHandler,
           'params' => $routeParams,
         ];
       }
@@ -81,13 +97,24 @@ class Router
     return null;
   }
 
-  public function get(string $uri, array $handler): void
+  public function middleware(?string $middleware = null): self
   {
-    $this->add('GET', $uri, $handler);
+    $this->routes[$this->lastMethod][$this->lastUri]['middleware'] = $middleware;
+
+    return $this;
   }
 
-  public function post(string $uri, array $handler): void
+  public function get(string $uri, array $handler): self
+  {
+    $this->add('GET', $uri, $handler);
+
+    return $this;
+  }
+
+  public function post(string $uri, array $handler): self
   {
     $this->add('POST', $uri, $handler);
+
+    return $this;
   }
 }
