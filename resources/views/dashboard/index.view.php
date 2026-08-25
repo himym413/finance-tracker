@@ -23,6 +23,11 @@
         class="inline-flex cursor-pointer items-center rounded-lg border border-red-200 bg-red-50 px-4 py-2 text-sm font-semibold text-red-700 transition-colors hover:bg-red-100 hover:border-red-300 focus:outline-none focus:ring-4 focus:ring-red-200">
         Logout
       </button>
+
+      <input
+        type="hidden"
+        name="_token"
+        value="<?= htmlspecialchars(csrfToken()) ?>">
     </form>
   </header>
 
@@ -44,7 +49,7 @@
           <strong class="block text-sm font-medium text-gray-600">Balance</strong>
 
           <p>
-            <span class="text-2xl font-medium text-gray-900 <?= $balanceColor ?>"><?= number_format($balance, 2) ?> KM</span>
+            <span class="text-2xl font-medium <?= $balanceColor ?>"><?= number_format($balance, 2) ?> KM</span>
           </p>
         </div>
       </article>

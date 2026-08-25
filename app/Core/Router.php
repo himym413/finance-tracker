@@ -51,6 +51,10 @@ class Router
     if ($middleware === 'auth' && !isAuthenticated())
       redirect('/login');
 
+    if ($httpMethod === 'POST') {
+      verifyCsrfToken();
+    }
+
     [$controllerClass, $controllerMethod] = $route['handler'];
 
     $controller = $this->container->resolve($controllerClass);
