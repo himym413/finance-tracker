@@ -5,6 +5,7 @@
 /** @var array $data */
 /** @var string $id */
 /** @var array $errors */
+/** @var string $backUrl */
 
 $errors ??= [];
 
@@ -17,7 +18,8 @@ $errors ??= [];
   'categories' => $categories,
   'errors' => $errors,
   'submitLabel' => 'Save Changes',
-  'action' => "/transactions/{$data['id']}"
+  'action' => "/transactions/{$data['id']}",
+  'backUrl' => $backUrl,
 ]); ?>
 
 <?php view('partials/footer'); ?>

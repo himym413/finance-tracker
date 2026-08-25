@@ -32,7 +32,7 @@
   </header>
 
   <main class="flex-1 space-y-6 p-6">
-    <div class="grid grid-cols-1 gap-4 sm:grid-cols-4">
+    <div class="grid grid-cols-1 gap-4 min-[400px]:grid-cols-2 lg:grid-cols-4">
 
       <?php
       $balanceColor = 'text-gray-900';
@@ -44,7 +44,7 @@
       }
       ?>
 
-      <article class="flex flex-col gap-4 rounded-lg border border-gray-200 bg-white p-6">
+      <article class="flex flex-col gap-4 rounded-lg border border-gray-200 bg-white px-4 py-2 md:p-6">
         <div>
           <strong class="block text-sm font-medium text-gray-600">Balance</strong>
 
@@ -54,7 +54,7 @@
         </div>
       </article>
 
-      <article class="flex flex-col gap-4 rounded-lg border border-gray-200 bg-white p-6">
+      <article class="flex flex-col gap-4 rounded-lg border border-gray-200 bg-white px-4 py-2 md:p-6">
         <div>
           <strong class="block text-sm font-medium text-gray-600">Total income</strong>
 
@@ -64,7 +64,7 @@
         </div>
       </article>
 
-      <article class="flex flex-col gap-4 rounded-lg border border-gray-200 bg-white p-6">
+      <article class="flex flex-col gap-4 rounded-lg border border-gray-200 bg-white px-4 py-2 md:p-6">
         <div>
           <strong class="block text-sm font-medium text-gray-600">Total expense</strong>
 
@@ -74,7 +74,7 @@
         </div>
       </article>
 
-      <article class="flex flex-col gap-4 rounded-lg border border-gray-200 bg-white p-6">
+      <article class="flex flex-col gap-4 rounded-lg border border-gray-200 bg-white px-4 py-2 md:p-6">
         <div>
           <strong class="block text-sm font-medium text-gray-600">Total transactions</strong>
 
