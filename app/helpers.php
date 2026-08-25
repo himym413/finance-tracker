@@ -56,3 +56,28 @@ function redirect(string $path): never
   header("Location: {$path}");
   exit();
 }
+
+function csrfToken(): string
+{
+  if (!isset($_SESSION['csrf_token'])) {
+    $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
+  }
+
+  return $_SESSION['csrf_token'];
+}
+
+function verifyCsrfToken(): void
+{
+  $token = $_POST['_token'] ?? '';
+
+  if (
+    !isset($_SESSION['csrf_token']) ||
+    !hash_equals($_SESSION['csrf_token'], $token)
+  ) {
+    http_response_code(419);
+
+    view('errors/419');
+
+    exit();
+  }
+}
