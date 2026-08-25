@@ -99,6 +99,7 @@ class TransactionController
     view('transactions/create', [
       'categories' => $this->categories(),
       'pageTitle' => 'Add Transaction',
+      'backUrl' => $this->backUrl(),
     ]);
   }
 
@@ -114,6 +115,7 @@ class TransactionController
         'data' => $data,
         'categories' => $categories,
         'pageTitle' => 'Add Transaction',
+        'backUrl' => $this->backUrl(),
       ]);
 
       return;
@@ -135,6 +137,7 @@ class TransactionController
       'data' => $transaction,
       'categories' => $categories,
       'pageTitle' => 'Edit Transaction',
+      'backUrl' => $this->backUrl(),
     ]);
   }
 
@@ -153,6 +156,7 @@ class TransactionController
         'data' => $data,
         'categories' => $categories,
         'pageTitle' => 'Edit Transaction',
+        'backUrl' => $this->backUrl(),
       ]);
 
       return;
@@ -211,5 +215,14 @@ class TransactionController
   private function sortOptions(): array
   {
     return require __DIR__ . '/../../config/sortOptions.php';
+  }
+
+  private function backUrl(): string
+  {
+    if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+      return $_POST['_back_url'] ?? '/transactions';
+    }
+
+    return $_SERVER['HTTP_REFERER'] ?? '/transactions';
   }
 }

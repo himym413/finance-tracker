@@ -5,12 +5,13 @@
 /** @var array $data */
 /** @var array $errors */
 /** @var string $action */
+/** @var string $backUrl */
 
 ?>
 
 <div class="p-6">
   <a
-    href="/transactions"
+    href="<?= htmlspecialchars($backUrl) ?>"
     class="mb-6 inline-flex items-center gap-2 rounded-lg border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 shadow-sm transition-all hover:border-gray-400 hover:bg-gray-50 hover:text-gray-900 focus:outline-none focus:ring-4 focus:ring-gray-200">
     <svg
       xmlns="http://www.w3.org/2000/svg"
@@ -111,6 +112,11 @@
       type="hidden"
       name="_token"
       value="<?= htmlspecialchars(csrfToken()) ?>">
+
+    <input
+      type="hidden"
+      name="_back_url"
+      value="<?= htmlspecialchars($backUrl) ?>">
 
     <button
       class="block w-full cursor-pointer rounded-lg border border-indigo-600 bg-indigo-600 px-12 py-3 text-sm font-medium text-white transition-colors hover:bg-indigo-800"
